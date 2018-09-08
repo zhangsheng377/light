@@ -12,6 +12,9 @@ int servo_degree = 0;
 Servo myservo;  // create servo object to control a servo
 const int myservo_pin = 9;
 
+#include <EEPROM.h>
+const int eeAddress = 0;   //Location we want the data to be put.
+
 void setup() {
   // initialize serial:
   Serial.begin(9600);
@@ -29,6 +32,8 @@ void setup() {
   digitalWrite(button_HIGH_pin, LOW);
 
   myservo.attach(myservo_pin);  // attaches the servo on pin 9 to the servo object
+  
+  EEPROM.get(eeAddress, servo_degree);
 }
 
 void loop() {
@@ -51,13 +56,14 @@ void loop() {
     --servo_degree;                          // waits for the servo to get there
   }
   if (160 < servo_degree) {                 // 死区问题
-    servo_degree = 21;
+    servo_degree = 160;
   } else if (20 > servo_degree) {
-    servo_degree = 159;
+    servo_degree = 20;
   }
   Serial.println(servo_degree);
   myservo.write(servo_degree);                  // sets the servo position according to the scaled value
-  delay(100);
+  EEPROM.put(eeAddress, servo_degree);
+  delay(80);
 }
 
 /*
